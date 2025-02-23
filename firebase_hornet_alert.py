@@ -72,21 +72,25 @@ def send_email_alert(node_id):
 def firebase_listener(event):
     print(f"🔹 Firebase Event Received: {event}")  # Debugging
 
-    # ✅ Extract `node_id` correctly
+    # ✅ Extract node_id safely
     node_id = "unknown"
     try:
-        if isinstance(event, dict):
-            if "path" in event and isinstance(event["path"], str):  # Ensure "path" exists
-                path_parts = event["path"].strip("/").split("/")
-                if path_parts:
-                    node_id = path_parts[0]  # Extract node ID safely
+        if isinstance(event, dict) and "path" in event and isinstance(event["path"], str):
+            path_parts = event["path"].strip("/").split("/")
+            if path_parts:
+                node_id = path_parts[0]  # Extract node_id
 
-            # ✅ Ensure data exists and check for `hornetDetected`
-            if "data" in event and isinstance(event["data"], dict):
+        # ✅ Ensure data exists and check for `hornetDetected`
+        if "data" in event:
+            if isinstance(event["data"], dict):
                 for key, value in event["data"].items():
                     if isinstance(value, dict) and value.get("hornetDetected") is True:
                         print(f"🚨 Hornet detected in {node_id}, sending email alerts...")
                         send_email_alert(node_id)
+            elif event["data"] == True:
+                print(f"🚨 Hornet detected in {node_id}, sending email alerts...")
+                send_email_alert(node_id)
+
     except Exception as e:
         print(f"❌ Error processing Firebase event: {e}")
 
