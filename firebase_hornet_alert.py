@@ -68,14 +68,18 @@ def send_email_alert(node_id):
 def firebase_listener(event):
     print(f"🔹 Firebase Event Received: {event}")  # Debugging
 
-    if isinstance(event, dict) and "data" in event:
-        data = event["data"]
+    # ✅ Extract node_id safely
+    node_id = "unknown"
+    if isinstance(event, dict) and "path" in event:
+        node_id = event["path"].split("/")[1]
 
-        if data and isinstance(data, dict):  # Ensure it's a dictionary
-            for node_id, node_data in data.items():
-                if node_data.get("hornetDetected") is True:
-                    print(f"🚨 Hornet detected in {node_id}, sending email alerts...")
-                    send_email_alert(node_id)
+    # ✅ Ensure data exists
+    if "data" in event and isinstance(event["data"], dict):
+        for key, value in event["data"].items():
+            if isinstance(value, dict) and value.get("hornetDetected") is True:
+                print(f"🚨 Hornet detected in {node_id}, sending email alerts...")
+                send_email_alert(node_id)
+
 
 # ✅ Attach Listener to Firebase Realtime Database (Monitoring all nodes under 2490315)
 db.child("2490315").stream(firebase_listener)
