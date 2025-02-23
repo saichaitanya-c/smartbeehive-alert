@@ -86,5 +86,6 @@ def firebase_listener(event):
                 print(f"🚨 Hornet detected in {node_id}, sending email alerts...")
                 send_email_alert(node_id)
 
+
 # ✅ Attach Listener to Firebase Realtime Database (Monitoring all nodes under 2490315)
 db.child("2490315").stream(firebase_listener)
