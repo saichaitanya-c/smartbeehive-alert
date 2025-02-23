@@ -70,15 +70,19 @@ def send_email_alert(node_id):
 
 # ✅ Function to Monitor Firebase for Hornet Detection
 def firebase_listener(event):
-    print(f"🔹 Firebase Event Received: {event}")  # Debugging
+    print("🔹 Raw Firebase Event:")
+    print(json.dumps(event, indent=2))  # Debugging
 
     # ✅ Extract node_id safely
     node_id = "unknown"
     try:
-        if isinstance(event, dict) and "path" in event and isinstance(event["path"], str):
+        # ✅ Check if "path" is missing and extract from "data" instead
+        if "path" in event and isinstance(event["path"], str):
             path_parts = event["path"].strip("/").split("/")
             if path_parts:
                 node_id = path_parts[0]  # Extract node_id
+        elif "data" in event and isinstance(event["data"], dict):
+            node_id = list(event["data"].keys())[0]  # Use the first key as node_id
 
         # ✅ Ensure data exists and check for `hornetDetected`
         if "data" in event:
@@ -93,6 +97,7 @@ def firebase_listener(event):
 
     except Exception as e:
         print(f"❌ Error processing Firebase event: {e}")
+
 
 
 # ✅ Attach Listener to Firebase Realtime Database (Monitoring all nodes under 2490315)
