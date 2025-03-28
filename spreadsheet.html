@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  <link rel="stylesheet" href="allnodes/scripts/styles.css">
+    <title>Google Spreadsheet Actions</title>
+    <style>
+         body, header {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color:rgba(101, 145, 87, 1);
+        }
+
+        .navbar-title {
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-title img {
+            height: 40px;
+            margin-right: 10px;
+        }
+
+        .time-text, .day-text {
+            margin: 0; /* Remove any extra margin */
+        }
+
+        button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .link {
+            text-decoration: none;
+            color: #333;}
+    </style>
+
+<header class="navbar">
+    <div class="navbar-title">
+        <img src="images/beehive.png" alt="Beehive Logo">
+        <span>All Beehives Dashboard</span>
+    </div>
+    <p class="time-text"><span id="time"></span><span class="time-sub-text" id="ampm"></span></p>
+    <p class="day-text" id="day"></p>
+</header>
+
+<!-- Navigation Bar <div id="nodes-container"></div>-->
+<nav>
+    <div class="menu-btn">
+        <div class="line line--1"></div>
+        <div class="line line--2"></div>
+        <div class="line line--3"></div>
+    </div>
+
+    <div class="nav-links">
+        <a href="dashboard1.html" class="link">Home</a>
+        <a href="https://drive.usercontent.google.com/download?id=1ZhP3pwhAQR23Hdamh5K7L3Q_eC3Fnu_Q&export=download&confirm=t&uuid=fbf2703d-a23c-432f-ac01-68283111c3b7" class="link">Download App</a>
+        <a href="buttons.html" class="link">LoadCell Calibration</a>
+        <a href="allnodes1.html" class="link">View All Beehives</a>
+        <a href="spreadsheet.html" class="link" target="_blank">View History</a>
+        <a href="graphfor-1.html" class="link">View Activity Charts</a>
+        <a href="livefeed2.html" class="link">Live Stream</a>
+        <a href="nodesaddandremove.html" class="link">Beehive Management</a>
+        <a href="contactus1.html" class="link">Contact Us</a>
+        <a href="index.html" onclick="logoutUser()" id="logoutLink">Logout</a>
+    </div>
+</nav>
+
+
+
+    <h1>Google Spreadsheet Actions</h1>
+    <!-- Button to View the Spreadsheet -->
+    <button onclick="viewSpreadsheet()">View Spreadsheet</button>
+    
+    <!-- Button to Download the Spreadsheet as PDF -->
+    <button onclick="downloadPDF()">Download as PDF</button>
+
+    <script>
+        // URL of your Google Spreadsheet
+        const spreadsheetUrl = "https://docs.google.com/spreadsheets/d/1pGBGuP2zV2txN9k_DjOtw0PNFTAddvpUbRan68Nh3yU/edit?usp=sharing";
+
+        // Function to open the spreadsheet in a new tab
+        function viewSpreadsheet() {
+            window.open(spreadsheetUrl, "_blank");
+        }
+
+        // Function to download the spreadsheet as a PDF
+        function downloadPDF() {
+            const pdfUrl = spreadsheetUrl.replace("/edit?usp=sharing", "/export?format=pdf");
+            window.open(pdfUrl, "_blank");
+        }
+    </script>
+    <script src="allnodes/scripts/datetime.js"></script>
+    <script src="allnodes/scripts/Menu.js"></script>
+    <script src="allnodes/scripts/node-config.js"></script>
+    
+</body>
+</html>

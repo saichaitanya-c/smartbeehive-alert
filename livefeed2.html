@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="scripts/styles.css">
+  <title>Live Stream</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      width: 90%;
+      max-width: 800px;
+      text-align: center;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    iframe {
+      width: 100%;
+      height: 450px;
+      border: none;
+      border-radius: 8px;
+    }
+    .btn {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      color: #fff;
+      background-color: #c1a362;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .btn:hover {
+      background-color: #b39252;
+    }
+  </style>
+  <!-- Navigation Bar -->
+<nav>
+  <div class="menu-btn">
+      <div class="line line--1"></div>
+      <div class="line line--2"></div>
+      <div class="line line--3"></div>
+  </div>
+
+  <div class="nav-links">
+    <a href="dashboard1.html" class="link">Home</a>
+    <a href="https://drive.usercontent.google.com/download?id=1ZhP3pwhAQR23Hdamh5K7L3Q_eC3Fnu_Q&export=download&confirm=t&uuid=fbf2703d-a23c-432f-ac01-68283111c3b7" class="link">Download App</a>
+    <a href="allnodes1.html" class="link">View AllBeehives</a>
+    <a href="https://docs.google.com/spreadsheets/d/13267Z1p6zjq9Yur6jjxmnrLkjZOcrYgP9EeDw09aDO4/edit?usp=sharing" class="link" target="_blank">View History</a>
+    <a href="graphfor-1.html" class="link">View Activity Charts</a>
+    <a href="livefeed2.html" class="link">Live Stream</a>
+    <a href="nodesaddandremove.html" class="link">Beehive Management</a>
+    <a href="contactus1.html" class="link">Contact Us</a>
+    <a href="#" onclick="logoutUser()" id="logoutLink">Logout</a>
+</div>
+</nav>
+</head>
+<body>
+  <div class="container">
+    <h1>Live Stream</h1>
+    <iframe src="https://www.youtube.com/" allowfullscreen></iframe>
+    <p>Enjoy the live feed!</p>
+    <button class="btn" onclick="openFullScreen()">Full Screen</button>
+  </div>
+  <script>
+    function openFullScreen() {
+      var element = document.documentElement;
+      if (element.requestFullscreen) {
+        element.requestFullscreen();
+      } else if (element.webkitRequestFullscreen) { // Safari
+        element.webkitRequestFullscreen();
+      } else if (element.msRequestFullscreen) { // IE11
+        element.msRequestFullscreen();
+      }
+    }
+  </script>
+
+  <!-- Custom Scripts -->
+<script src="allnodes/scripts/firebase-config1.js"></script>
+<script src="allnodes/scripts/datetime.js"></script>
+<script src="allnodes/scripts/Menu.js"></script>
+<script src="allnodes/scripts/node-config.js"></script>
+</body>
+</html>
+

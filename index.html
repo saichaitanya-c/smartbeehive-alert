@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In/Up Form</title>
+    <link rel="stylesheet" href="index/styles1.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    
+    <!-- Include Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+</head>
+<body>
+    <h2>Welcome to Smart Beehive</h2>
+    <div class="container" id="container">
+        <!-- Registration Container -->
+        <div class="form-container sign-up-container">
+            <form id="registerForm">
+                <h1>Create Account</h1>
+                <span>or use your email for registration</span>
+                <input type="text" id="registerName" placeholder="Name" required>
+                <input type="email" id="registerEmail" placeholder="Email" required>
+                <input type="password" id="registerPassword" placeholder="Password" required>
+                <input type="text" id="registerUniqueId" placeholder="Unique ID" required>
+                <button type="submit" class="btn">Register</button>
+            </form>
+        </div>
+        
+        <!-- Login Container -->
+          
+        <div class="form-container sign-in-container">
+            <form id="loginForm">
+                <h1>Sign In</h1>
+                <span>or use your account</span>
+                <input type="email" id="loginEmail" placeholder="Email" required>
+                <input type="password" id="loginPassword" placeholder="Password" required>
+                <a href="#" id="forgotPasswordLink">Forgot your password?</a>
+                <button type="submit" class="btn">Login</button>
+                
+                <!-- New Button for Redirection -->
+                <button type="button" class="btn redirect-btn" onclick="window.open('https://drive.google.com/file/d/1bLP4q7IJ6vPMo9sr0YfU0xprJUkk8c5v/view?usp=sharing', '_blank');">
+                    Download User Manual
+                </button>
+            </form>
+        </div>
+        
+        <style>
+            /* Add space above the "Go to Example" button */
+            .redirect-btn {
+                margin-top: 20px; /* Adjust the value as needed */
+            }
+        </style>
+        
+        
+        
+        <!-- Forgot Password Container -->
+        <div class="form-container forgot-password-container">
+            <form id="forgotPasswordForm">
+                <h1>Reset Password</h1>
+                <p>Enter your email address to receive a password reset link.</p>
+                <input type="email" id="forgotEmail" placeholder="Email" required>
+                <button type="submit" class="btn">Send Reset Link</button>
+                <a href="#" id="backToSignIn">Back to Sign In</a>
+                
+            </form>
+        </div>
+
+        <!-- Overlay -->
+        <div class="overlay-container">
+            <div class="overlay">
+                <div class="overlay-panel overlay-left">
+                    <h1>Welcome Back!</h1>
+                    <p>To keep connected with us please login with your personal info</p>
+                    <button class="ghost" id="signIn">Sign In</button>
+                </div>
+                <div class="overlay-panel overlay-right">
+                    <h1>New Here? Join Us Today</h1>
+                    <p>Create an account to unlock smart monitoring features.</p>
+                    <button class="ghost" id="signUp">Sign Up</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer>
+        <p></p>
+        
+    </footer>
+
+       
+    <!-- Include your custom script -->
+    <script src="index/scriptfb.js"></script>
+</body>
+</html>

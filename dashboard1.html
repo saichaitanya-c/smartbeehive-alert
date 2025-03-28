@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Beehive Monitoring Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="scripts/styles.css">
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
+   
+</head>
+<script>
+window.addEventListener('DOMContentLoaded', function () {
+    const isAuthenticated = sessionStorage.getItem('authenticated');
+    if (!isAuthenticated || isAuthenticated !== 'true') {
+        window.location.href = 'index.html'; // Redirect to login if not authenticated
+    }
+});
+</script>
+
+    <header class="navbar">
+    <div class="navbar-title">
+        <img src="images/beehive.png" alt="Beehive Logo">
+        <span>Smart Beehive Monitoring Dashboard</span>
+    </div>
+    <p class="time-text"><span id="time"></span><span class="time-sub-text" id="ampm"></span></p>
+    <p class="day-text" id="day"></p>
+    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 16 16" stroke-width="0" fill="currentColor" stroke="currentColor" class="moondate"></path></svg>
+</div>
+
+</header>
+    <label class="switch">
+  <span class="sun"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="#ffd43b"><circle r="5" cy="12" cx="12"></circle><path d="m21 13h-1a1 1 0 0 1 0-2h1a1 1 0 0 1 0 2zm-17 0h-1a1 1 0 0 1 0-2h1a1 1 0 0 1 0 2zm13.66-5.66a1 1 0 0 1 -.66-.29 1 1 0 0 1 0-1.41l.71-.71a1 1 0 1 1 1.41 1.41l-.71.71a1 1 0 0 1 -.75.29zm-12.02 12.02a1 1 0 0 1 -.71-.29 1 1 0 0 1 0-1.41l.71-.66a1 1 0 0 1 1.41 1.41l-.71.71a1 1 0 0 1 -.7.24zm6.36-14.36a1 1 0 0 1 -1-1v-1a1 1 0 0 1 2 0v1a1 1 0 0 1 -1 1zm0 17a1 1 0 0 1 -1-1v-1a1 1 0 0 1 2 0v1a1 1 0 0 1 -1 1zm-5.66-14.66a1 1 0 0 1 -.7-.29l-.71-.71a1 1 0 0 1 1.41-1.41l.71.71a1 1 0 0 1 0 1.41 1 1 0 0 1 -.71.29zm12.02 12.02a1 1 0 0 1 -.7-.29l-.66-.71a1 1 0 0 1 1.36-1.36l.71.71a1 1 0 0 1 0 1.41 1 1 0 0 1 -.71.24z"></path></g></svg></span>
+  <span class="moon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path d="m223.5 32c-123.5 0-223.5 100.3-223.5 224s100 224 223.5 224c60.6 0 115.5-24.2 155.8-63.4 5-4.9 6.3-12.5 3.1-18.7s-10.1-9.7-17-8.5c-9.8 1.7-19.8 2.6-30.1 2.6-96.9 0-175.5-78.8-175.5-176 0-65.8 36-123.1 89.3-153.3 6.1-3.5 9.2-10.5 7.7-17.3s-7.3-11.9-14.3-12.5c-6.3-.5-12.6-.8-19-.8z"></path></svg></span>   
+  <input type="checkbox" class="input">
+  <span class="slider"></span>
+</label>
+
+<nav>
+    <div class="menu-btn">
+        <div class="line line--1"></div>
+        <div class="line line--2"></div>
+        <div class="line line--3"></div>
+    </div>
+
+    <div class="nav-links">
+        <a href="dashboard1.html" class="link">Home</a>
+        <a href="https://drive.usercontent.google.com/download?id=1ZhP3pwhAQR23Hdamh5K7L3Q_eC3Fnu_Q&export=download&confirm=t&uuid=fbf2703d-a23c-432f-ac01-68283111c3b7" class="link">Download App</a>
+        <a href="buttons.html" class="link">LoadCell Calibration</a>
+        <a href="allnodes1.html" class="link">View All Beehives</a>
+        <a href="spreadsheet.html" class="link" target="_blank">View History</a>
+        <a href="graphfor-1.html" class="link">View Activity Charts</a>
+        <a href="livefeed2.html" class="link">Live Stream</a>
+        <a href="nodesaddandremove.html" class="link">Beehive Management</a>
+        <a href="contactus1.html" class="link">Report Malfuction</a>
+        <a href="index.html" onclick="logoutUser()" id="logoutLink">Logout</a>
+    </div>
+</nav>
+
+
+
+
+  <div class="main-content">
+
+    
+    <div class="node-selector">
+        <label for="nodeSelect" id="nodeSelectLabel">Select Hive:</label>
+        <select id="nodeSelect" onchange="loadNodeData()"></select>
+    </div>
+    
+  </div>
+
+
+        
+
+        <div class="card-container">
+            <div class="card temperature">
+                <img src="images/temperature.png" alt="Temperature Icon">
+                <h3 id="temperatureTitle">Temperature</h3>
+                <div id="temperature" class="temperature-info">
+                    <div class="loading">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+                <canvas id="temperatureChart" class="chart"></canvas>
+            </div>
+            
+            <div class="card weight">
+                <img src="images/weight.png" alt="Weight Icon">
+                <h3 id="weightTitle">Weight</h3>
+                <div id="weight" class="weight-info">
+                    <div class="loading">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+                <canvas id="weightChart" class="chart"></canvas>
+            </div>
+            
+            <div class="card hornet-detection">
+                <img src="images/hornet.png" alt="Hornet Detection Icon">
+                <h3 id="HornetDetectionTitle">Hornet Detection</h3>
+                <p id="HornetDetection">No hornet detected...</p>
+            </div>
+        
+   <!-- 🔹 Battery Card (Replacing Humidity) -->
+   <div class="card battery">
+    <h3 id="batteryTitle"></h3>
+    <div class="battery-container">
+        <div id="battery" class="battery">
+            <div class="acid-container">
+                <div class="acid">
+                    <div id="level" class="fill">
+                        <div class="waves">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                 xmlns:xlink="http://www.w3.org/1999/xlink"
+                                 viewBox="0 24 150 28"
+                                 preserveAspectRatio="none">
+                                <defs>
+                                    <path id="gentle-wave"
+                                          d="M-160 44c30 0 
+                                             58-18 88-18s
+                                             58 18 88 18 
+                                             58-18 88-18 
+                                             58 18 88 18
+                                             v44h-352z" />
+                                </defs>
+                                <g class="parallax">
+                                    <use xlink:href="#gentle-wave" x="50" y="0" fill="#4579e2"/>
+                                    <use xlink:href="#gentle-wave" x="50" y="3" fill="#3461c1"/>
+                                    <use xlink:href="#gentle-wave" x="50" y="6" fill="#2d55aa"/>  
+                                </g>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="percentage">
+        <i id="icon" class="fas fa-plug"></i><span id="percentage">0</span>%
+    </div>
+</div>
+</div>
+
+    
+
+    <!-- Custom Scripts -->
+    <script src="scripts/firebase-config1.js"></script>
+    <script src="scripts/battery.js"></script>
+    <script src="scripts/datetime.js"></script>
+    <script src="scripts/Menu.js"></script>
+    <script src="scripts/node-config.js"></script>
+    <script>
+
+
+       // Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+//mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
+let currentNode = null;  // Track the current node being selected
+
+// Initialize charts
+let temperatureChart, weightChart;
+
+// ✅ Initialize Charts
+function initializeCharts() {
+    temperatureChart = new Chart(document.getElementById('temperatureChart').getContext('2d'), {
+        type: 'line',
+        data: { labels: [], datasets: [{ label: 'Temperature (°C)', data: [], borderColor: 'red', fill: false }] }
+    });
+
+    weightChart = new Chart(document.getElementById('weightChart').getContext('2d'), {
+        type: 'line',
+        data: { labels: [], datasets: [{ label: 'Weight (kg)', data: [], borderColor: 'blue', fill: false }] }
+    });
+}
+
+// ✅ Load Node Data and Update Charts for Selected Node
+function loadNodeData() {
+    const selectedNode = document.getElementById("nodeSelect").value;
+
+    // If the selected node is the same as the current one, no need to reload data
+    if (selectedNode === currentNode) {
+        return;
+    }
+
+    // Reset previous node's data and charts
+    resetCharts();
+
+    // Remove previous Firebase listener if exists
+    if (currentNode !== null) {
+        db.ref(`2490315/${currentNode}`).off("value");  // Unsubscribe from the previous node's data
+    }
+
+    currentNode = selectedNode;
+
+    // Listen for data updates for the new selected node
+    db.ref(`2490315/${currentNode}`).on("value", (snapshot) => {
+        if (!snapshot.exists()) return;
+
+        const data = snapshot.val();
+        document.getElementById("temperature").textContent = `${data?.temperature ?? 'N/A'} °C`;
+        document.getElementById("weight").textContent = `${data?.weight ?? 'N/A'} kg`;
+        document.getElementById("HornetDetection").textContent = data?.hornetDetected ? "Hornet detected" : "No hornet detected";
+
+        // Update charts with the new node data
+        updateCharts(data);
+
+        if (data.battery !== undefined) {
+            refreshLevel(Number(data.battery)); // Refresh battery level if available
+        }
+    });
+}
+
+// ✅ Update Temperature and Weight Charts for Selected Node
+function updateCharts(data) {
+    const time = new Date().toLocaleTimeString();
+
+    // Shift data to keep only the latest 30 entries (for better visualization)
+    if (temperatureChart.data.labels.length >= 30) { 
+        temperatureChart.data.labels.shift(); 
+        temperatureChart.data.datasets[0].data.shift(); 
+    }
+    if (weightChart.data.labels.length >= 30) { 
+        weightChart.data.labels.shift(); 
+        weightChart.data.datasets[0].data.shift(); 
+    }
+
+    // Add new data points for temperature and weight
+    temperatureChart.data.labels.push(time);
+    weightChart.data.labels.push(time);
+    temperatureChart.data.datasets[0].data.push(parseFloat(data?.temperature ?? 0));
+    weightChart.data.datasets[0].data.push(parseFloat(data?.weight ?? 0));
+
+    // Update both charts
+    temperatureChart.update();
+    weightChart.update();
+}
+
+// ✅ Reset Charts when Switching Nodes
+function resetCharts() {
+    // Clear data from both charts when switching nodes
+    temperatureChart.data.labels = [];
+    temperatureChart.data.datasets[0].data = [];
+    temperatureChart.update();
+
+    weightChart.data.labels = [];
+    weightChart.data.datasets[0].data = [];
+    weightChart.update();
+}
+
+// ✅ Populate Node Selector Dropdown
+function updateNodeSelector() {
+    const nodeSelect = document.getElementById("nodeSelect");
+    nodeSelect.innerHTML = "";  // Clear current options
+
+    db.ref("2490315").once("value").then((snapshot) => {
+        if (!snapshot.exists()) return;
+
+        const nodes = snapshot.val();
+        Object.keys(nodes).forEach((nodeId) => {
+            const option = document.createElement("option");
+            option.value = nodeId;
+            option.textContent = nodeId;
+            nodeSelect.appendChild(option);
+        });
+
+        nodeSelect.value = Object.keys(nodes)[0];  // Set the default value to the first node
+        loadNodeData();  // Load data for the first node
+    });
+}
+
+// Initialize Node Selector & Charts when the DOM is ready
+document.addEventListener("DOMContentLoaded", () => {
+    initializeCharts();  // Initialize the charts
+    updateNodeSelector();  // Populate the node selector dropdown
+});
+
+// Function to Refresh Battery Level
+function refreshLevel(batteryValue) {
+    if (isNaN(batteryValue) || batteryValue < 1 || batteryValue > 10) {
+        console.error("Invalid battery value:", batteryValue);
+        return;
+    }
+
+    let level = Math.round((batteryValue / 10) * 100); // Convert to percentage
+    let fillHeight = Math.round((batteryValue / 10) * 140); // Adjust fill height
+
+    // Update Acid Fill Height Instantly
+    document.documentElement.style.setProperty('--acid-height', `${fillHeight}px`);
+    document.querySelector(".waves").style.transform = `translateY(calc(-1 * ${fillHeight}px))`;
+
+    // Update Battery Percentage
+    let percentageElement = document.getElementById("percentage");
+    let currentValue = parseInt(percentageElement.innerText) || 0; 
+    percentageElement.innerText = level; 
+
+    // CountUp.js Animation
+    let countUp = new CountUp("percentage", currentValue, level, 0, 2);
+    if (!countUp.error) {
+        countUp.start();
+    } else {
+        console.error("[CountUp] Error:", countUp.error);
+    }
+
+    // Hide Charging Icon (Optional)
+    document.documentElement.style.setProperty('--display-charging', "none");
+}
+
+// Logout the user and redirect to login
+function logoutUser() {
+    firebase.auth().signOut()
+        .then(() => {
+            sessionStorage.removeItem('authenticated'); // Clear sessionStorage
+            window.location.href = "index.html";
+        })
+        .catch((error) => {
+            alert(error.message);
+            console.error('Logout error:', error);
+        });
+}
+
+
+    </script>
+</body>
+</html>
+<!-- <footer id="footer">Smart Beehive Monitoring - Stay Informed, Stay Connected</footer> -->

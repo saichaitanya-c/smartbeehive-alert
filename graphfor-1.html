@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<link rel="stylesheet" href="graphs/styles/graphsstyles.css">
+<html lang="en">
+<head>
+    <nav>
+        <div class="menu-btn">
+            <div class="line line--1"></div>
+            <div class="line line--2"></div>
+            <div class="line line--3"></div>
+        </div>
+    
+        <div class="nav-links">
+            <a href="dashboard1.html" class="link">Home</a>
+            <a href="https://drive.usercontent.google.com/download?id=1ZhP3pwhAQR23Hdamh5K7L3Q_eC3Fnu_Q&export=download&confirm=t&uuid=fbf2703d-a23c-432f-ac01-68283111c3b7" class="link">Download App</a>
+            <a href="buttons.html" class="link">LoadCell Calibration</a>
+            <a href="allnodes1.html" class="link">View All Beehives</a>
+            <a href="spreadsheet.html" class="link" target="_blank">View History</a>
+            <a href="graphfor-1.html" class="link">View Activity Charts</a>
+            <a href="livefeed2.html" class="link">Live Stream</a>
+            <a href="nodesaddandremove.html" class="link">Beehive Management</a>
+            <a href="contactus1.html" class="link">Report Malfuction</a>
+            <a href="index.html" onclick="logoutUser()" id="logoutLink">Logout</a>
+        </div>
+    </nav>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beehives Monitoring Dashboard</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+        }
+        .chart-container {
+            max-width: 1600px;
+            margin: 20px auto;
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        
+    </style>
+    <button id="clearDataBtn" style="display: block; margin: 20px auto; padding: 10px 20px; font-size: 16px; background-color: red; color: white; border: none; cursor: pointer;">
+        Clear All Data
+    </button>
+    
+</head>
+<body>
+    <h1>Beehives Monitoring Dashboard</h1>
+
+    <div id="chartSection"></div> <!-- Dynamic chart section -->
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCc2CHbWxVlmLtGGF5L5tY_VxOnfuRo5FU",
+            authDomain: "test1-3e832.firebaseapp.com",
+            databaseURL: "https://test1-3e832-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "test1-3e832",
+            storageBucket: "test1-3e832.firebasestorage.app",
+            messagingSenderId: "518093938096",
+            appId: "1:518093938096:web:c29cb0c1981327777e4a75",
+            measurementId: "G-C0X95TBMCL"
+        };
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// Load Google Charts
+google.charts.load('current', { packages: ['corechart'] });
+google.charts.setOnLoadCallback(initializeCharts);
+
+// Max data points for display
+const maxDataPoints = 10;
+const temperatureDataMap = {}; // Stores temperature data for each node
+const weightDataMap = {}; // Stores weight data for each node
+const temperatureCharts = {}; // Stores Google Chart instances for temperature
+const weightCharts = {}; // Stores Google Chart instances for weight
+
+// 🔹 Save Data to Local Storage
+function saveToLocalStorage(nodeId) {
+    localStorage.setItem(`temperatureData_${nodeId}`, JSON.stringify(temperatureDataMap[nodeId]));
+    localStorage.setItem(`weightData_${nodeId}`, JSON.stringify(weightDataMap[nodeId]));
+}
+
+// 🔹 Load Data from Local Storage
+function loadFromLocalStorage(nodeId) {
+    const savedTempData = localStorage.getItem(`temperatureData_${nodeId}`);
+    const savedWeightData = localStorage.getItem(`weightData_${nodeId}`);
+
+    if (savedTempData) {
+        temperatureDataMap[nodeId] = JSON.parse(savedTempData);
+        drawChart(nodeId, "temperature");
+    }
+    if (savedWeightData) {
+        weightDataMap[nodeId] = JSON.parse(savedWeightData);
+        drawChart(nodeId, "weight");
+    }
+}
+
+// 🔹 Fetch Node List and Generate Graphs Dynamically
+function initializeCharts() {
+    db.ref('2490315').once('value', snapshot => {
+        const nodes = snapshot.val();
+        if (!nodes) return;
+
+        const chartSection = document.getElementById("chartSection");
+        chartSection.innerHTML = ""; // Clear existing charts
+
+        Object.keys(nodes).forEach((nodeId, index) => {
+            // Create chart containers dynamically
+            const beehiveNumber = index + 1;
+            const nodeTitle = document.createElement("h2");
+            nodeTitle.textContent = `Beehive ${beehiveNumber}`;
+            
+            // Temperature Chart
+            const tempChartDiv = document.createElement("div");
+            tempChartDiv.id = `temperature_chart_${nodeId}`;
+            tempChartDiv.className = "chart-container";
+
+            // Weight Chart
+            const weightChartDiv = document.createElement("div");
+            weightChartDiv.id = `weight_chart_${nodeId}`;
+            weightChartDiv.className = "chart-container";
+
+            chartSection.appendChild(nodeTitle);
+            chartSection.appendChild(tempChartDiv);
+            chartSection.appendChild(weightChartDiv);
+
+            // Initialize chart data structure
+            temperatureDataMap[nodeId] = [['Time', 'Temperature (°C)']];
+            weightDataMap[nodeId] = [['Time', 'Weight (kg)']];
+
+            // 🔹 Load saved data from Local Storage
+            loadFromLocalStorage(nodeId);
+
+            // Fetch and update data from Firebase
+            updateNodeData(nodeId);
+        });
+    });
+}
+
+// 🔹 Function to Draw Charts Separately
+function drawChart(nodeId, type) {
+    let data, elementId, options, chartInstance;
+
+    if (type === "temperature") {
+        if (!temperatureDataMap[nodeId] || temperatureDataMap[nodeId].length <= 1) return;
+        data = google.visualization.arrayToDataTable(temperatureDataMap[nodeId]);
+        elementId = `temperature_chart_${nodeId}`;
+        options = {
+            title: `Beehive Temperature Data`,
+            curveType: 'function',
+            legend: { position: 'bottom' },
+            width: 1600, 
+            height: 500,
+            hAxis: { title: 'Time' },
+            vAxis: { title: 'Temperature (°C)' }
+        };
+        if (!temperatureCharts[nodeId]) {
+            temperatureCharts[nodeId] = new google.visualization.LineChart(document.getElementById(elementId));
+        }
+        chartInstance = temperatureCharts[nodeId];
+    } else {
+        if (!weightDataMap[nodeId] || weightDataMap[nodeId].length <= 1) return;
+        data = google.visualization.arrayToDataTable(weightDataMap[nodeId]);
+        elementId = `weight_chart_${nodeId}`;
+        options = {
+            title: `Beehive Weight Data`,
+            curveType: 'function',
+            legend: { position: 'bottom' },
+            width: 1600, 
+            height: 500,
+            hAxis: { title: 'Time' },
+            vAxis: { title: 'Weight (kg)' }
+        };
+        if (!weightCharts[nodeId]) {
+            weightCharts[nodeId] = new google.visualization.LineChart(document.getElementById(elementId));
+        }
+        chartInstance = weightCharts[nodeId];
+    }
+
+    chartInstance.draw(data, options);
+}
+
+// 🔹 Function to Fetch and Update Data for Each Node Dynamically
+function updateNodeData(nodeId) {
+    db.ref(`2490315/${nodeId}`).on('value', (snapshot) => {
+        const data = snapshot.val();
+        if (!data) return;
+
+        const currentTime = new Date().toLocaleTimeString();
+        const temperature = data.temperature || 0;
+        const weight = data.weight || 0;
+
+        // Add new data to the respective charts
+        temperatureDataMap[nodeId].push([currentTime, temperature]);
+        weightDataMap[nodeId].push([currentTime, weight]);
+
+        // Keep only the last 10 data points
+        if (temperatureDataMap[nodeId].length > maxDataPoints + 1) {
+            temperatureDataMap[nodeId].splice(1, 1);
+        }
+        if (weightDataMap[nodeId].length > maxDataPoints + 1) {
+            weightDataMap[nodeId].splice(1, 1);
+        }
+
+        // 🔹 Save updated data to Local Storage
+        saveToLocalStorage(nodeId);
+
+        // Draw updated charts
+        drawChart(nodeId, "temperature");
+        drawChart(nodeId, "weight");
+    });
+}
+
+// 🔹 Load Data from Local Storage When the Page Refreshes
+window.addEventListener('load', () => {
+    Object.keys(localStorage).forEach((key) => {
+        if (key.startsWith('temperatureData_')) {
+            const nodeId = key.replace('temperatureData_', '');
+            loadFromLocalStorage(nodeId);
+        }
+        if (key.startsWith('weightData_')) {
+            const nodeId = key.replace('weightData_', '');
+            loadFromLocalStorage(nodeId);
+        }
+    });
+});
+
+// Function to Clear Local Storage
+function clearLocalStorage() {
+    localStorage.clear(); // Remove all stored values
+    alert("All stored data has been cleared!");
+    location.reload(); // Refresh the page
+}
+
+// Attach Event Listener to Button
+document.getElementById('clearDataBtn').addEventListener('click', clearLocalStorage);
+
+
+// Menu behavior
+var menuBtn = document.querySelector('.menu-btn');
+var nav = document.querySelector('nav');
+var lineOne = document.querySelector('nav .menu-btn .line--1');
+var lineTwo = document.querySelector('nav .menu-btn .line--2');
+var lineThree = document.querySelector('nav .menu-btn .line--3');
+var link = document.querySelector('nav .nav-links');
+
+menuBtn.addEventListener('click', () => {
+    nav.classList.toggle('nav-open');
+    lineOne.classList.toggle('line-cross');
+    lineTwo.classList.toggle('line-fade-out');
+    lineThree.classList.toggle('line-cross');
+    link.classList.toggle('fade-in');
+});
+
+// Night mode toggle
+document.addEventListener('DOMContentLoaded', function () {
+    const switchInput = document.querySelector('.switch .input');
+
+    function toggleNightMode() {
+        document.body.classList.toggle('night-mode');
+    }
+
+    switchInput.addEventListener('change', toggleNightMode);
+});
+function logoutUser() {
+    firebase.auth().signOut()
+        .then(() => {
+            sessionStorage.removeItem('authenticated'); // Clear sessionStorage
+            window.location.href = "index.html";
+        })
+        .catch((error) => {
+            alert(error.message);
+            console.error('Logout error:', error);
+        });
+}
+window.addEventListener('DOMContentLoaded', function () {
+    const isAuthenticated = sessionStorage.getItem('authenticated');
+    if (!isAuthenticated || isAuthenticated !== 'true') {
+        window.location.href = 'index.html'; // Redirect to login if not authenticated
+    }
+});
+
+    </script>
+</body>
+</html>
